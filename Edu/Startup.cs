@@ -12,6 +12,7 @@ using Microsoft.EntityFrameworkCore;
 using Edu.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.SpaServices.AngularCli;
 
 namespace Edu
 {
@@ -59,7 +60,7 @@ namespace Edu
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-            app.UseCookiePolicy();
+            //app.UseCookiePolicy();
 
             app.UseAuthentication();
 
@@ -67,7 +68,23 @@ namespace Edu
             {
                 routes.MapRoute(
                     name: "default",
-                    template: "{controller=Home}/{action=Index}/{id?}");
+                    template: "index.html");
+                routes.MapRoute(
+                    name: "api",
+                    template: "api/{controller}/{action}");
+            });
+
+            app.UseSpa((spa) =>
+            {
+                spa.Options.SourcePath = "ClientApp";
+                if (env.IsDevelopment())
+                {
+                    spa.UseAngularCliServer("start");
+                }
+                else
+                {
+                    spa.UseProxyToSpaDevelopmentServer("https://localhost/index.html");
+                }
             });
         }
     }
