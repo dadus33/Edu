@@ -9,10 +9,14 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Edu.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.SpaServices.AngularCli;
+using Edu.DAL.Context;
+using Edu.DAL.UnitOfWork;
+using Edu.DAL.UnitOfWork.Implementations;
+using Edu.DAL.Services;
+using Edu.DAL.Services.Implementations;
 
 namespace Edu
 {
@@ -35,11 +39,30 @@ namespace Edu
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
-            services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(
-                    Configuration.GetConnectionString("DefaultConnection")));
-            services.AddDefaultIdentity<IdentityUser>()
-                .AddEntityFrameworkStores<ApplicationDbContext>();
+            services.AddMvcCore().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+
+            services.AddDbContext<EduContext>(
+                        (options) =>
+                        {
+                            options.UseSqlServer(Configuration.GetConnectionString("Test"));
+                        },
+                        ServiceLifetime.Scoped
+                    );
+
+            services.Add(new ServiceDescriptor(
+                        typeof(IUnitOfWork),
+                        (service) =>
+                        {
+                            return new UnitOfWork(service.GetService<EduContext>());
+                        },
+                        ServiceLifetime.Scoped
+                    ));
+
+            services.Add(new ServiceDescriptor(
+                        typeof(IHumanService),
+                        typeof(HumanService),
+                        ServiceLifetime.Scoped
+                    ));
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }
@@ -60,15 +83,15 @@ namespace Edu
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-            //app.UseCookiePolicy();
+            if (!env.IsDevelopment())
+            {
+                app.UseCookiePolicy();
+            }
 
             app.UseAuthentication();
 
             app.UseMvc(routes =>
             {
-                routes.MapRoute(
-                    name: "default",
-                    template: "index.html");
                 routes.MapRoute(
                     name: "api",
                     template: "api/{controller}/{action}");
@@ -80,10 +103,6 @@ namespace Edu
                 if (env.IsDevelopment())
                 {
                     spa.UseAngularCliServer("start");
-                }
-                else
-                {
-                    spa.UseProxyToSpaDevelopmentServer("https://localhost/index.html");
                 }
             });
         }
