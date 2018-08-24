@@ -30,10 +30,9 @@ namespace Edu.DAL.Repositories.Implementations
             return dbContext.Humans.Where((human) => filter(human)).ToList();
         }
 
-        public override bool Update(Human entity)
+        public override Human Update(Human entity)
         {
-            dbContext.Humans.Update(entity);
-            return true;
+            return dbContext.Humans.Update(entity).Entity;
         }
 
         public override bool Delete(int id)

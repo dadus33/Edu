@@ -1,0 +1,15 @@
+div{
+  display: block;
+  margin: auto;
+}
+
+div button{
+  display: block;
+  margin: auto;
+}
+
+label{
+  display: block;
+  margin-left: 0px;
+  padding-left: 0px;
+}

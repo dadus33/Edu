@@ -1,0 +1,8 @@
+<div>
+  <label>Name: <input type="text" [(ngModel)]="human.name"></label>
+  <label>Date of Birth: <input type="date" [(ngModel)]="human.dateOfBirth"></label>
+  <label>ID: <input disabled type="text" value="will be generated"></label>
+  <button [disabled]="!canAdd()" (click)="addHuman()">Add</button>
+  <p>{{message}}</p>
+</div>
+<button (click)="location.back()">Go back</button>

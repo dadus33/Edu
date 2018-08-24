@@ -25,30 +25,30 @@ namespace Edu.Controllers
         [Route("api/[controller]/[action]")]
         public ActionResult<Human> Add([FromBody]Human human)
         {
+            if (!ModelState.IsValid)
+            {
+                return null;
+            }
             Human created = humanService.Create(human);
             if(created == null)
             {
-                return Accepted("Failed!");
+                return NoContent();
             }
             return created;
         }
 
         [HttpGet]
         [Route("api/[controller]/[action]")]
-        public ActionResult<List<Human>> List([FromQuery]string name, [FromQuery]int? id, [FromQuery]DateTime? birthDate)
+        public ActionResult<List<Human>> List([FromQuery]string name, [FromQuery]int? id, [FromQuery]DateTime? dateOfBirth)
         {
-            HumanFilter filter = new HumanFilter(id, name, birthDate);
+            HumanFilter filter = new HumanFilter(id, name, dateOfBirth);
             List<Human> matchedItems = humanService.List(filter.GeneratePredicate());
-            if(matchedItems.Count == 0)
-            {
-                return NotFound();
-            }
             return matchedItems;
         }
 
         [HttpGet]
-        [Route("api/human/get/{id:int}")]
-        public ActionResult<Human> Get(int id)
+        [Route("api/[controller]/[action]")]
+        public ActionResult<Human> Get([FromQuery]int id)
         {
             
             Human returnedEntity = humanService.Get(id);
@@ -61,29 +61,25 @@ namespace Edu.Controllers
 
         [HttpPost]
         [Route("api/[controller]/[action]")]
-        public ActionResult Update(Human human)
+        public ActionResult<Human> Update([FromBody]Human human)
         {
-            if (humanService.Update(human))
+            Human updated;
+            if ((updated = humanService.Update(human)) != null)
             {
-                return Ok("Updated");
+                return human;
             }
-            return NoContent();
+            return BadRequest();
         }
 
         [HttpDelete]
         [Route("api/[controller]/[action]")]
         public ActionResult Delete(int id)
         {
-            Human toDelete = humanService.Get(id);
-            if(toDelete == null)
+            if (humanService.Delete(id))
             {
-                return Accepted((object)"Failed!");
+                return NoContent();
             }
-            if (humanService.Delete(toDelete))
-            {
-                return Ok("Deleted!");
-            }
-            return Accepted();
+            return BadRequest();
         }
         
 

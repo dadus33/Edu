@@ -11,7 +11,7 @@ namespace Edu.DAL.Services
         Human Create(Human human);
         Human Get(int id);
         List<Human> List(Predicate<Human> filter);
-        bool Update(Human human);
-        bool Delete(Human human);
+        Human Update(Human human);
+        bool Delete(int id);
     }
 }

@@ -27,14 +27,15 @@ namespace Edu.DAL.Services.Implementations
             return added;
         }
 
-        public bool Delete(Human human)
+        public bool Delete(int id)
         {
             //We don't delete people with invalid IDs
-            if(!isValidID(human.ID))
+            if(!isValidID(id))
             {
                 return false;
             }
-            bool deleted = unitOfWork.HumanRepository.Delete(human.ID);
+
+            bool deleted = unitOfWork.HumanRepository.Delete(id);
 
             unitOfWork.Save();
 
@@ -57,13 +58,13 @@ namespace Edu.DAL.Services.Implementations
             return (List<Human>) unitOfWork.HumanRepository.List(filter);
         }
 
-        public bool Update(Human human)
+        public Human Update(Human human)
         {
             if (!isValidHuman(human))
             {
-                return false;
+                return null;
             }
-            bool updated = unitOfWork.HumanRepository.Update(human);
+            Human updated = unitOfWork.HumanRepository.Update(human);
 
             unitOfWork.Save();
 
@@ -78,8 +79,10 @@ namespace Edu.DAL.Services.Implementations
         
         private bool isValidHuman(Human entity)
         {
-            //Let's say we only register people who are born after 1990 and don't have "Dick" in their names
-            return (entity.DateOfBirth > DateTime.Parse("1990-01-01")) && (!entity.Name.Contains("Dick")) && (isValidID(entity.ID));
+            bool valid = true;
+            valid &= isValidID(entity.ID);
+            valid &= (entity.Name != null ? entity.Name.Length != 0 : false);
+            return valid;
         }
     }
 }

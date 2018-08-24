@@ -1,0 +1,39 @@
+<h2>List of Humans</h2>
+<div>
+  <div>
+    <h3>Search by:</h3>
+  </div>
+
+  <label>
+    Name:
+    <input (input)="humanFilter.name = $event.target.value; updateSearch()" placeholder="name">
+  </label>
+
+  <label>
+    Birth Date:
+    <input type="date" (input)="humanFilter.dateOfBirth = $event.target.value; updateSearch()" placeholder="1999-01-01">
+  </label>
+
+  <label>
+    ID:
+    <input (input)="humanFilter.id = $event.target.value; updateSearch()" placeholder="1">
+  </label>
+</div>
+
+<ul>
+  <li *ngFor="let item of searchResults">
+    <a routerLink="details/{{item.id}}">
+      <label>
+        ID: {{item.id}}
+      </label>
+      <label>
+        Name: {{item.name}}
+      </label>
+      <label>
+        Birth Date: {{item.dateOfBirth | date:'mediumDate'}}
+      </label>
+    </a>
+  </li>
+</ul>
+<button routerLink="add">Add new</button>
+

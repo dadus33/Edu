@@ -13,7 +13,7 @@ namespace Edu.DAL.Repositories
 
         TEntity Create(TEntity entity);
 
-        bool Update(TEntity entity);
+        TEntity Update(TEntity entity);
 
         bool Delete(int id);
 

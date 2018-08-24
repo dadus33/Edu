@@ -24,23 +24,19 @@ namespace Edu.Models.Filters.Implementations
             return (human) =>
             {
                 bool matches = true;
-                bool allNull = true;
                 if (this.ID.HasValue)
                 {
-                    matches = matches && this.ID == human.ID;
-                    allNull = false;
+                    matches = matches && (this.ID.HasValue ? (this.ID == human.ID) : true);
                 }
                 if (Name != null)
                 {
-                    matches = matches && this.Name == human.Name;
-                    allNull = false;
+                    matches = matches && (this.Name == null ? true : human.Name.Contains(this.Name));
                 }
                 if (DateOfBirth.HasValue)
                 {
-                    matches = matches && this.DateOfBirth == human.DateOfBirth;
-                    allNull = false;
+                    matches = matches && (this.DateOfBirth.HasValue ? (Math.Abs(this.DateOfBirth.Value.Subtract(human.DateOfBirth).TotalDays) <= 1D) : true);
                 }
-                return matches && !allNull;
+                return matches;
             };
         }
     }

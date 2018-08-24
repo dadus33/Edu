@@ -44,7 +44,7 @@ namespace Edu.DAL.Repositories.Implementations
         public abstract IEnumerable<TEntity> List(Predicate<TEntity> filter);
         public abstract TEntity GetById(int id);
         public abstract TEntity Create(TEntity entity);
-        public abstract bool Update(TEntity entity);
+        public abstract TEntity Update(TEntity entity);
         public abstract bool Delete(int id);
         public abstract void Save();
     }

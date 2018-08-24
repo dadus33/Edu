@@ -1,0 +1,8 @@
+<div>
+  <label>Name: <input type="text" [(ngModel)]="human.name"></label>
+  <label>Date of Birth: <input type="date" [(ngModel)]="human.dateOfBirth"></label>
+  <label>ID: <input disabled type="number" value="{{human.id}}"></label>
+  <button [disabled]="!loaded" (click)="save()">Save</button>
+  <p>{{responseString}}</p>
+</div>
+<button (click)="location.back()">Go back</button>
