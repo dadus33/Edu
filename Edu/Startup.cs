@@ -17,6 +17,7 @@ using Edu.DAL.UnitOfWork;
 using Edu.DAL.UnitOfWork.Implementations;
 using Edu.DAL.Services;
 using Edu.DAL.Services.Implementations;
+using Edu.Models.Identity;
 
 namespace Edu
 {
@@ -39,15 +40,28 @@ namespace Edu
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
-            services.AddMvcCore().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+
 
             services.AddDbContext<EduContext>(
-                        (options) =>
-                        {
-                            options.UseSqlServer(Configuration.GetConnectionString("Test"));
-                        },
-                        ServiceLifetime.Scoped
-                    );
+                (options) =>
+                {
+                    options.UseMySql(Configuration.GetConnectionString("Development"));
+                },
+                ServiceLifetime.Scoped
+            );
+
+
+            services.AddIdentity<User, Role>(
+                    (options) =>
+                    {
+                        options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5D);
+                        options.Password.RequireNonAlphanumeric = false;
+                        options.User.RequireUniqueEmail = true;
+                    }
+                )
+                .AddDefaultTokenProviders()
+                .AddEntityFrameworkStores<EduContext>();
 
             services.Add(new ServiceDescriptor(
                         typeof(IUnitOfWork),
@@ -63,8 +77,6 @@ namespace Edu
                         typeof(HumanService),
                         ServiceLifetime.Scoped
                     ));
-
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -105,6 +117,8 @@ namespace Edu
                     spa.UseAngularCliServer("start");
                 }
             });
+
+            
         }
     }
 }

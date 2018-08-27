@@ -1,4 +1,7 @@
 ﻿using Edu.Models.Entities;
+using Edu.Models.Identity;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -7,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Edu.DAL.Context
 {
-    public class EduContext : DbContext
+    public class EduContext : IdentityDbContext<User, Role, int>
     {
         public DbSet<Human> Humans { get; set; }
 
@@ -35,7 +38,7 @@ namespace Edu.DAL.Context
                         DateOfBirth = DateTime.Now
                     }
                 );
-            
+            base.OnModelCreating(modelBuilder);
         }
     }
 }

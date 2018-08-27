@@ -42,8 +42,7 @@ export class HumanEditComponent implements OnInit {
 
     this.humanService.getHuman(id).subscribe(
       (data) => {
-        this.human = data;
-        this.human.dateOfBirth = formatDate(this.human.dateOfBirth, "yyyy-MM-dd", "en_US");
+        this.loadHuman(data);
         this.loaded = true;
       },
       (error) => {
@@ -59,7 +58,7 @@ export class HumanEditComponent implements OnInit {
 
     this.humanService.updateHuman(this.human).subscribe(
       (data) => {
-        this.human = data;
+        this.loadHuman(data);
         this.responseString = "Successful update!";
       },
       (error) => {
@@ -67,6 +66,12 @@ export class HumanEditComponent implements OnInit {
         this.router.navigateByUrl(this.router.url);
       }
     )
+  }
+
+
+  loadHuman(data: Human) {
+    this.human = data;
+    this.human.dateOfBirth = formatDate(this.human.dateOfBirth, "yyyy-MM-dd", "en_US");
   }
 
 }
