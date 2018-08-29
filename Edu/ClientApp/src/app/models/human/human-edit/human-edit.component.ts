@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Location, formatDate } from '@angular/common';
-import { HumanService } from '../../../services/human.service';
+import { HumanService } from '../../../services/human/human.service';
 import { Human } from '../human.interface';
 
 @Component({

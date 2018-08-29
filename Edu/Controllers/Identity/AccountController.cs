@@ -1,16 +1,22 @@
 ﻿using Edu.Models.Identity;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Security.Claims;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Edu.Controllers.Identity
 {
     [ApiController]
-    [Authorize]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [Route("api/account/")]
     public class AccountController : ControllerBase
     {
@@ -18,10 +24,13 @@ namespace Edu.Controllers.Identity
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
 
-        public AccountController(UserManager<User> userManager, SignInManager<User> signInManager)
+        private readonly IConfiguration _config;
+
+        public AccountController(UserManager<User> userManager, SignInManager<User> signInManager, IConfiguration config)
         {
             this._userManager = userManager;
             this._signInManager = signInManager;
+            this._config = config;
         }
 
         [Route("register")]
@@ -39,9 +48,11 @@ namespace Edu.Controllers.Identity
                 return BadRequest();
             }
 
-            await LoginUser(await _userManager.FindByEmailAsync(model.email), model.password, false);
+            User user = await _userManager.FindByEmailAsync(model.email);
 
-            return Ok();
+            await LoginUser(user, model.password, false);
+
+            return Ok(GenerateJwtToken(model.email, user));
         }
 
 
@@ -50,11 +61,8 @@ namespace Edu.Controllers.Identity
         [AllowAnonymous]
         public async Task<ActionResult> Login([FromBody]LoginModel model)
         {
-            if (_signInManager.IsSignedIn(User))
-            {
-                return BadRequest("AlreadyLoggedIn");
-            }
-            Microsoft.AspNetCore.Identity.SignInResult result = await LoginUser(await _userManager.FindByEmailAsync(model.email), model.password, true);
+            User user = await _userManager.FindByEmailAsync(model.email);
+            Microsoft.AspNetCore.Identity.SignInResult result = await LoginUser(user, model.password, true);
             if (!result.Succeeded)
             {
                 if (result.IsLockedOut)
@@ -64,7 +72,7 @@ namespace Edu.Controllers.Identity
                 return BadRequest("WrongUserOrPassword");
             }
 
-            return Ok();
+            return Ok(GenerateJwtToken(model.email, user));
         }
 
 
@@ -77,14 +85,22 @@ namespace Edu.Controllers.Identity
             return Ok();
         }
 
+        [Route("test")]
+        [HttpPost]
+        public ActionResult<string> Test()
+        {
+            
+            return "mah nigga";
+        }
 
 
 
         #region Helpers
         private async Task<Microsoft.AspNetCore.Identity.SignInResult> LoginUser(User user, string password, bool lockout)
         {
-            return await _signInManager.PasswordSignInAsync(user, password, true, lockout);
+            return await _signInManager.CheckPasswordSignInAsync(user, password, lockout);
         }
+
 
         private async Task LogoutUser()
         {
@@ -92,14 +108,41 @@ namespace Edu.Controllers.Identity
             return;
         }
 
-        public class RegisterModel
+
+        private string GenerateJwtToken(string email, User user)
+        {
+            List<Claim> claims = new List<Claim>
+            {
+                new Claim(JwtRegisteredClaimNames.Sub, email),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new Claim("adr", HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString())
+            };
+
+            SymmetricSecurityKey key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(this._config.GetValue<string>("Authentication:Secret")));
+            SigningCredentials creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+            DateTime expires = DateTime.Now.AddDays(this._config.GetValue<int>("Authentication:ExpiryTimeInDays"));
+
+            JwtSecurityToken token = new JwtSecurityToken(
+                _config.GetValue<string>("Authentication:Issuer"),
+                _config.GetValue<string>("Authentication:Issuer"),
+                claims,
+                expires: expires,
+                signingCredentials: creds
+            );
+
+            return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+
+
+        public struct RegisterModel
         {
             public string email { get; set; }
             public string userName { get; set; }
             public string password { get; set; }
         }
 
-        public class LoginModel
+        public struct LoginModel
         {
             public string email { get; set; }
             public string password { get; set; }

@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Human } from '../human.interface';
-import { HumanService } from '../../../services/human.service';
+import { HumanService } from '../../../services/human/human.service';
 import { Location } from '@angular/common';
 import { Router } from '@angular/router';
 

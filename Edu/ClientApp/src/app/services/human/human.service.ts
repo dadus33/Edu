@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Human } from '../models/human/human.interface';
+import { Human } from '../../models/human/human.interface';
 import { Observable } from 'rxjs';
 import { pipe } from 'rxjs';
 import { HttpClient, HttpParams, HttpRequest, HttpResponse } from '@angular/common/http';

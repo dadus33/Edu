@@ -18,6 +18,11 @@ using Edu.DAL.UnitOfWork.Implementations;
 using Edu.DAL.Services;
 using Edu.DAL.Services.Implementations;
 using Edu.Models.Identity;
+using System.IdentityModel.Tokens.Jwt;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using System.Security.Claims;
 
 namespace Edu
 {
@@ -38,6 +43,7 @@ namespace Edu
                 // This lambda determines whether user consent for non-essential cookies is needed for a given request.
                 options.CheckConsentNeeded = context => true;
                 options.MinimumSameSitePolicy = SameSiteMode.None;
+
             });
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
@@ -63,6 +69,50 @@ namespace Edu
                 .AddDefaultTokenProviders()
                 .AddEntityFrameworkStores<EduContext>();
 
+            JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
+
+
+            services
+                .AddAuthentication(options =>
+                {
+                    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+                    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+
+                })
+                .AddJwtBearer(cfg =>
+                {
+                    cfg.RequireHttpsMetadata = true;
+
+                    cfg.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidIssuer = Configuration.GetValue<string>("Authentication:Issuer"),
+                        
+                        ValidAudience = Configuration.GetValue<string>("Authentication:Issuer"),
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration.GetValue<string>("Authentication:Secret"))),
+                        ClockSkew = TimeSpan.Zero // remove delay of token when expire
+                    };
+
+
+                    cfg.Events = new JwtBearerEvents()
+                    {
+                        OnTokenValidated = (ctx) =>
+                        {
+                            Claim ipClaim = ctx.Principal.Claims.FirstOrDefault((claim) => claim.Type == "adr");
+                            if (ipClaim == null || ipClaim.Value
+                                != ctx.HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString())
+                            {
+                                ctx.Fail("Wrong IP address!");
+                                return Task.CompletedTask;
+                            }
+
+                            ctx.Success();
+
+                            return Task.CompletedTask;
+                        }
+                    };
+                });
+
             services.Add(new ServiceDescriptor(
                         typeof(IUnitOfWork),
                         (service) =>
@@ -76,6 +126,11 @@ namespace Edu
                         typeof(IHumanService),
                         typeof(HumanService),
                         ServiceLifetime.Scoped
+                    ));
+
+            services.Add(new ServiceDescriptor(
+                        typeof(IConfiguration),
+                        Configuration
                     ));
         }
 
@@ -118,7 +173,13 @@ namespace Edu
                 }
             });
 
-            
+
         }
+
+        //private Task CheckIpAddress()
+        //{
+
+        //}
+
     }
 }

@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Location } from '@angular/common'
 import { Human } from '../human.interface';
-import { HumanService } from '../../../services/human.service';
+import { HumanService } from '../../../services/human/human.service';
 import { ActivatedRoute, Data, Params } from '@angular/router';
 
 @Component({

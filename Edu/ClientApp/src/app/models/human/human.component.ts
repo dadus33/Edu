@@ -1,6 +1,6 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import { Human } from './human.interface';
-import { HumanService } from '../../services/human.service';
+import { HumanService } from '../../services/human/human.service';
 import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
