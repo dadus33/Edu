@@ -1,25 +1,37 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
+import { FormsModule } from '@angular/forms';
+
 import { HumanAddComponent } from './human-add.component';
 
+import { HumanService } from './../../../services/human/human.service';
+
 describe('HumanAddComponent', () => {
-  let component: HumanAddComponent;
-  let fixture: ComponentFixture<HumanAddComponent>;
+    let component: HumanAddComponent;
+    let fixture: ComponentFixture<HumanAddComponent>;
 
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [ HumanAddComponent ]
-    })
-    .compileComponents();
-  }));
+    beforeEach(async(() => {
+        TestBed.configureTestingModule({
+            imports: [FormsModule],
+            declarations: [HumanAddComponent],
+            providers: [HumanService]
+        })
+        .compileComponents();
+    }));
 
-  beforeEach(() => {
-    fixture = TestBed.createComponent(HumanAddComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
+    beforeEach(() => {
+        fixture = TestBed.createComponent(HumanAddComponent);
+        component = fixture.componentInstance;
+        component.human = {
+            name: "ionel",
+            dateOfBirth: "12-01-1099",
+            id: 12
+        }
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
+        fixture.detectChanges();
+    });
+
+    it('should create', () => {
+        expect(component).toBeTruthy();
+    });
 });
