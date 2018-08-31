@@ -264,3 +264,7 @@ __pycache__/
 **/dist
 **/tmp
 **/out-tsc
+
+# wwwroot
+
+./Edu/wwwroot/

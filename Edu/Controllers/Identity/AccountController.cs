@@ -21,16 +21,16 @@ namespace Edu.Controllers.Identity
     public class AccountController : ControllerBase
     {
 
-        private readonly UserManager<User> _userManager;
-        private readonly SignInManager<User> _signInManager;
+        private readonly UserManager<User> userManager;
+        private readonly SignInManager<User> signInManager;
 
-        private readonly IConfiguration _config;
+        private readonly IConfiguration config;
 
         public AccountController(UserManager<User> userManager, SignInManager<User> signInManager, IConfiguration config)
         {
-            this._userManager = userManager;
-            this._signInManager = signInManager;
-            this._config = config;
+            this.userManager = userManager;
+            this.signInManager = signInManager;
+            this.config = config;
         }
 
         [Route("register")]
@@ -41,14 +41,14 @@ namespace Edu.Controllers.Identity
             User toCreate = new User();
             toCreate.Email = model.email;
             toCreate.UserName = model.userName;
-            IdentityResult result = await _userManager.CreateAsync(toCreate, model.password);
+            IdentityResult result = await userManager.CreateAsync(toCreate, model.password);
 
             if (!result.Succeeded)
             {
                 return BadRequest();
             }
 
-            User user = await _userManager.FindByEmailAsync(model.email);
+            User user = await userManager.FindByEmailAsync(model.email);
 
             await LoginUser(user, model.password, false);
 
@@ -61,7 +61,7 @@ namespace Edu.Controllers.Identity
         [AllowAnonymous]
         public async Task<ActionResult> Login([FromBody]LoginModel model)
         {
-            User user = await _userManager.FindByEmailAsync(model.email);
+            User user = await userManager.FindByEmailAsync(model.email);
             Microsoft.AspNetCore.Identity.SignInResult result = await LoginUser(user, model.password, true);
             if (!result.Succeeded)
             {
@@ -89,7 +89,7 @@ namespace Edu.Controllers.Identity
         [HttpPost]
         public ActionResult<string> Test()
         {
-            
+
             return "mah nigga";
         }
 
@@ -98,13 +98,13 @@ namespace Edu.Controllers.Identity
         #region Helpers
         private async Task<Microsoft.AspNetCore.Identity.SignInResult> LoginUser(User user, string password, bool lockout)
         {
-            return await _signInManager.CheckPasswordSignInAsync(user, password, lockout);
+            return await signInManager.CheckPasswordSignInAsync(user, password, lockout);
         }
 
 
         private async Task LogoutUser()
         {
-            await _signInManager.SignOutAsync();
+            await signInManager.SignOutAsync();
             return;
         }
 
@@ -119,13 +119,13 @@ namespace Edu.Controllers.Identity
                 new Claim("adr", HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString())
             };
 
-            SymmetricSecurityKey key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(this._config.GetValue<string>("Authentication:Secret")));
+            SymmetricSecurityKey key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(this.config.GetValue<string>("Authentication:Secret")));
             SigningCredentials creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-            DateTime expires = DateTime.Now.AddDays(this._config.GetValue<int>("Authentication:ExpiryTimeInDays"));
+            DateTime expires = DateTime.Now.AddDays(this.config.GetValue<int>("Authentication:ExpiryTimeInDays"));
 
             JwtSecurityToken token = new JwtSecurityToken(
-                _config.GetValue<string>("Authentication:Issuer"),
-                _config.GetValue<string>("Authentication:Issuer"),
+                config.GetValue<string>("Authentication:Issuer"),
+                config.GetValue<string>("Authentication:Issuer"),
                 claims,
                 expires: expires,
                 signingCredentials: creds
@@ -148,7 +148,5 @@ namespace Edu.Controllers.Identity
             public string password { get; set; }
         }
         #endregion
-
-
     }
 }

@@ -16,7 +16,7 @@ describe('HumanAddComponent', () => {
             declarations: [HumanAddComponent],
             providers: [HumanService]
         })
-        .compileComponents();
+            .compileComponents();
     }));
 
     beforeEach(() => {

@@ -13,7 +13,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "outputPath": "wwwroot/dist/ClientApp",
+            "outputPath": "./wwwroot/",
             "index": "ClientApp/index.html",
             "main": "ClientApp/main.ts",
             "polyfills": "ClientApp/polyfills.ts",
@@ -44,7 +44,7 @@
               "extractLicenses": true,
               "vendorChunk": false,
               "buildOptimizer": true,
-              "outputPath": "../wwwroot/"
+              "outputPath": "./wwwroot/"
             }
           }
         },

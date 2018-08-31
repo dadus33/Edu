@@ -1,0 +1,6 @@
+<div>
+    <label>E-Mail: <input type="text" [(ngModel)]="email"></label>
+    <label>Password: <input type="password" [(ngModel)]="password"></label>
+    <button [disabled]="!canLogin()" (click)="login()">Login</button>
+    <p>{{responseString}}</p>
+</div>

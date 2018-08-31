@@ -122,16 +122,8 @@ namespace Edu
                         ServiceLifetime.Scoped
                     ));
 
-            services.Add(new ServiceDescriptor(
-                        typeof(IHumanService),
-                        typeof(HumanService),
-                        ServiceLifetime.Scoped
-                    ));
-
-            services.Add(new ServiceDescriptor(
-                        typeof(IConfiguration),
-                        Configuration
-                    ));
+            services.AddTransient<IHumanService, HumanService>();
+            services.AddSingleton<IConfiguration>(Configuration);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -166,7 +158,8 @@ namespace Edu
 
             app.UseSpa((spa) =>
             {
-                spa.Options.SourcePath = "ClientApp";
+                spa.Options.SourcePath = "./";
+                //spa.Options.DefaultPage = new PathString("/dist/index.html");
                 if (env.IsDevelopment())
                 {
                     spa.UseAngularCliServer("start");
