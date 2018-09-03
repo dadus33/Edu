@@ -7,13 +7,14 @@ using Edu.DAL.Services;
 using Edu.DAL.UnitOfWork;
 using Edu.Models.Entities;
 using Edu.Models.Filters.Implementations;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Edu.Controllers
 {
-    [Authorize]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class HumanController : ControllerBase
     {
         private readonly IHumanService humanService;

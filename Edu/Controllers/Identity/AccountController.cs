@@ -85,15 +85,6 @@ namespace Edu.Controllers.Identity
             return Ok();
         }
 
-        [Route("test")]
-        [HttpPost]
-        public ActionResult<string> Test()
-        {
-
-            return "mah nigga";
-        }
-
-
 
         #region Helpers
         private async Task<Microsoft.AspNetCore.Identity.SignInResult> LoginUser(User user, string password, bool lockout)

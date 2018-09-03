@@ -18,7 +18,8 @@ const routes: Routes = [
             { path: "humans/add", component: HumanAddComponent }
         ]
     },
-    { path: "login", component: LoginPageComponent }
+    { path: "login", component: LoginPageComponent },
+    { path: "**", redirectTo: "/", pathMatch: "full" }
 ];
 const routerModuleWithProviders: ModuleWithProviders<RouterModule> = RouterModule.forRoot(routes);
 @NgModule({
